@@ -163,7 +163,7 @@ on each module.
    Build the documentation by running:
 
    ```bash
-   make html
+   make.bat html
    ```
    This will create an HTML version of your docs in the docs/_build/html/ directory.
 
