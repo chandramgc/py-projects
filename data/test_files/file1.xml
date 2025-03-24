@@ -1,0 +1,24 @@
+<IFML>
+    <File>
+        <Message>
+            <BasicPayment>
+                <ProcessingRule>
+                    <Level>message</Level>
+                    <Type>PRM</Type>
+                    <ExecutionParm>
+                        <ParmID>RULE1</ParmID>
+                        <ParmValues>VALUE1</ParmValues>
+                    </ExecutionParm>
+                </ProcessingRule>
+                <ProcessingRule>
+                    <Level>message</Level>
+                    <Type>PRM</Type>
+                    <ExecutionParm>
+                        <ParmID>RULE2</ParmID>
+                        <ParmValues>VALUE2</ParmValues>
+                    </ExecutionParm>
+                </ProcessingRule>
+            </BasicPayment>
+        </Message>
+    </File>
+</IFML>
