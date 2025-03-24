@@ -6,13 +6,13 @@ initializes the Application, and starts the Flask API server.
 from typing import Any
 
 import sys
-# import os
+import os
 from src.utils.config_reader import ConfigReader
 from src.utils.logger import setup_logger
 
 
 # Add the project root (the parent directory of src) to sys.path
-# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 def main():
     """

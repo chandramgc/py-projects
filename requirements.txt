@@ -3,3 +3,4 @@ GitPython
 pyyaml
 coverage
 sphinx
+autodoc

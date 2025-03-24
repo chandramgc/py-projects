@@ -1,17 +1,17 @@
-.. py-projects documentation master file, created by
-sphinx-quickstart on Sun Mar 23 21:56:13 2025.
-You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive.
+Welcome to My Project's Documentation!
+========================================
 
-py-projects documentation
-=========================
-
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+This project includes modules for configuration, logging, and the application entry point.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Modules:
 
+   modules
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
