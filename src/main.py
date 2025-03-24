@@ -8,8 +8,9 @@ from typing import Any
 import sys
 import os
 from src.utils.config_reader import ConfigReader
-from src.utils.logger import setup_logger
+from src.utils.logger import LoggerConfig
 from src.modules.p_rule_counter import ProcessingRuleCounter
+from src.services.report_writer import ReportWriter
 
 
 # Add the project root (the parent directory of src) to sys.path
@@ -21,7 +22,7 @@ def main():
     """
     # Get the environment from the command line, default to "dev" if not provided.
     env = sys.argv[1] if len(sys.argv) > 1 else "desktop"
-    logger: Any = setup_logger()
+    logger: Any = LoggerConfig().configure()
     logger.info("Starting the application")
 
     # Load configuration from YAML for the 'dev' environment.
@@ -31,19 +32,23 @@ def main():
 
     xml_directory = config.get("file.dir")
     xpath_expr = config.get("file.xpath_expr")
-    # To count based solely on ParmID, use key_mode="id"
-    counter_by_id = ProcessingRuleCounter(xml_directory, xpath_expr=xpath_expr, key_mode="id")
-    counts_by_id = counter_by_id.count_rules()
+    report_directory = config.get("file.report")
+    counter = ProcessingRuleCounter(xml_directory, xpath_expr=xpath_expr)
+    writer = ReportWriter(report_directory)
+
+    # Count unique keys based solely on ParmID.
+    counts_by_id = counter.count_rules(key_mode="id")
     print("Processing rule counts (unique by ParmID):")
     for key, count in sorted(counts_by_id.items(), key=lambda x: x[0]):
         print(f"{key}: {count}")
+    writer.write_counts_to_json(counts_by_id, "counts_by_id_report.json")
 
-    # To count based on the combination (ParmID, ParmValues), use key_mode="combined"
-    counter_combined = ProcessingRuleCounter(xml_directory, xpath_expr=xpath_expr, key_mode="combined")
-    counts_combined = counter_combined.count_rules()
+    # Count unique keys based on the combination (ParmID, ParmValues).
+    counts_combined = counter.count_rules(key_mode="combined")
     print("\nProcessing rule counts (unique by (ParmID, ParmValues)):")
     for key, count in sorted(counts_combined.items(), key=lambda x: x[0]):
         print(f"{key}: {count}")
+    writer.write_counts_to_json(counts_combined, "counts_combined.json")
 
     logger.info("Application finished execution")
 

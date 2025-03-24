@@ -1,7 +1,1 @@
 profile: uat
-logging:
-  log_file: "logs\\app.log"
-  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  max_bytes: 10000
-  backup_count: 5
-  level: "info"

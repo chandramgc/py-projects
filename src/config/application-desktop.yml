@@ -1,11 +1,5 @@
 profile: desktop
 file:
   xpath_expr: ".//ProcessingRule/ExecutionParm"
-  dir: "data/raw"
-logging:
-  log_file: "logs\\app.log"
-  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  max_bytes: 10000
-  backup_count: 5
-  level: "info"
-
+  dir: "data\\raw"
+  report: "data\\report"

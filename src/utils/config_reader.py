@@ -20,7 +20,7 @@ class ConfigReader:
         config (dict): The loaded configuration data.
     """
 
-    def __init__(self, env="dev"):
+    def __init__(self, env=None):
         """
         Initializes the ConfigReader for the specified environment.
 
@@ -28,7 +28,10 @@ class ConfigReader:
             env (str, optional): The environment identifier (e.g., "dev", "prod").
                                  Defaults to "dev".
         """
-        self.config_file = f"src/config/application-{env}.yml"
+        if (env is None):
+            self.config_file = f"src/config/application.yml"
+        else:
+            self.config_file = f"src/config/application-{env}.yml"
         self.config = self._load_config()
 
     def _load_config(self):
