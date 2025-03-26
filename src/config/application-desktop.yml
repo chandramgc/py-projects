@@ -1,5 +1,9 @@
 profile: desktop
 file:
-  xpath_expr: ".//ProcessingRule/ExecutionParm"
+  key_xpaths:
+    - ".//ProcessingRule/ExecutionParm/ParmID"
+    - ".//ProcessingRule/ExecutionParm/ParmValues"
   dir: "data\\raw"
-  report: "data\\report"
+  report:
+    dir: "data\\report"
+    file_name: "p_rules_report.json"

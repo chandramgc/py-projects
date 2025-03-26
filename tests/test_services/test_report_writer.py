@@ -6,40 +6,65 @@ from src.services.report_writer import ReportWriter  # Adjust the import as need
 
 
 class TestReportWriter(unittest.TestCase):
-    def test_write_counts_to_json(self):
-        # Sample counts dictionary: one key is a tuple, another is a simple string.
+    def setUp(self):
+        # Create a temporary directory for report output.
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.report_writer = ReportWriter(output_dir=self.temp_dir.name)
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_write_grouped_report(self):
+        # Sample counts dictionary with dynamic tuple keys.
         sample_counts = {
-            ("RULE1", "VALUE1"): 2,
-            "RULE2": 1
+            ("WFI$CHARGE_PARTY", "B"): 2,
+            ("WFI$CHARGE_PARTY", "W"): 2,
+            ("WFI$DISCOUNT", "A"): 4,
+            ("WFI$COMMISSION", "D"): 1,
+            ("WFI$COMMISSION", "M"): 1
         }
+        expected_report = [
+            {
+                "key": "WFI$CHARGE_PARTY",
+                "subValue": [
+                    {"key": "B", "count": "2"},
+                    {"key": "W", "count": "2"}
+                ],
+                "count": "4"
+            },
+            {
+                "key": "WFI$COMMISSION",
+                "subValue": [
+                    {"key": "D", "count": "1"},
+                    {"key": "M", "count": "1"}
+                ],
+                "count": "2"
+            },
+            {
+                "key": "WFI$DISCOUNT",
+                "subValue": [
+                    {"key": "A", "count": "4"}
+                ],
+                "count": "4"
+            }
+        ]
 
-        # Create a temporary directory to serve as the output directory.
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Instantiate ReportWriter with the temporary directory.
-            writer = ReportWriter(output_dir=temp_dir)
-            filename = "report_test.json"
-            writer.write_counts_to_json(sample_counts, filename=filename)
+        # Write the report.
+        report_filename = "test_report.json"
+        self.report_writer.write_grouped_report(sample_counts, filename=report_filename)
+        report_path = os.path.join(self.temp_dir.name, report_filename)
 
-            # Verify that the file was created.
-            output_file = os.path.join(temp_dir, filename)
-            self.assertTrue(os.path.exists(output_file))
+        # Verify that the file exists.
+        self.assertTrue(os.path.exists(report_path))
 
-            # Read and load the JSON file.
-            with open(output_file, "r") as f:
-                data = json.load(f)
+        # Read the JSON file.
+        with open(report_path, "r") as f:
+            report_data = json.load(f)
 
-            # Convert the JSON list back to a dictionary for easy comparison.
-            # Tuple keys are saved as arrays (lists) in JSON, so we convert them back to tuples.
-            result = {}
-            for item in data:
-                key = item["key"]
-                # If the key is a list, convert it to a tuple.
-                if isinstance(key, list):
-                    key = tuple(key)
-                result[key] = item["count"]
-
-            expected = {("RULE1", "VALUE1"): 2, "RULE2": 1}
-            self.assertEqual(result, expected)
+        # Sort both expected and generated lists by outer "key" for comparison.
+        report_data.sort(key=lambda x: x["key"])
+        expected_report.sort(key=lambda x: x["key"])
+        self.assertEqual(report_data, expected_report)
 
 
 if __name__ == "__main__":

@@ -31,25 +31,18 @@ def main():
     logger.info(f"This application is running on {profile}")
 
     xml_directory = config.get("file.dir")
-    xpath_expr = config.get("file.xpath_expr")
-    report_directory = config.get("file.report")
-    counter = ProcessingRuleCounter(xml_directory, xpath_expr=xpath_expr)
-    writer = ReportWriter(report_directory)
+    key_xpaths = config.get("file.key_xpaths")
+    report_directory = config.get("file.report.dir")
+    report_file_name = config.get("file.report.file_name")
 
-    # Count unique keys based solely on ParmID.
-    counts_by_id = counter.count_rules(key_mode="id")
-    print("Processing rule counts (unique by ParmID):")
-    for key, count in sorted(counts_by_id.items(), key=lambda x: x[0]):
-        print(f"{key}: {count}")
-    writer.write_counts_to_json(counts_by_id, "counts_by_id_report.json")
+    counter = ProcessingRuleCounter(xml_directory, key_xpaths)
+    rule_counts = counter.count_rules()
+    print("Rule counts (combination of keys):")
+    for key, count in sorted(rule_counts.items(), key=lambda x: x[0]):
+        print(f"{list(key)}: {count}")
 
-    # Count unique keys based on the combination (ParmID, ParmValues).
-    counts_combined = counter.count_rules(key_mode="combined")
-    print("\nProcessing rule counts (unique by (ParmID, ParmValues)):")
-    for key, count in sorted(counts_combined.items(), key=lambda x: x[0]):
-        print(f"{key}: {count}")
-    writer.write_counts_to_json(counts_combined, "counts_combined.json")
-
+    writer: ReportWriter = ReportWriter(report_directory)
+    writer.write_grouped_report(rule_counts, report_file_name)
     logger.info("Application finished execution")
 
 
