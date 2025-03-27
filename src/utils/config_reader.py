@@ -10,59 +10,99 @@ import yaml
 # Retrieve a logger for this module.
 logger = logging.getLogger(__name__)
 
-
 class ConfigReader:
     """
-    Loads application settings from YAML configuration files.
+    ConfigReader loads and merges multiple YAML configuration files from a given directory.
+    It supports specifying an environment (e.g., "dev" or "prod") and an optional module name.
+    If a module name is provided, only files whose filenames start with that module name are loaded.
+    The merged configuration is available via the get() method using dot‐notation.
 
-    Attributes:
-        config_file (str): The path to the configuration YAML file.
-        config (dict): The loaded configuration data.
+    Example directory structure:
+
+        config/
+            dev/
+                module1-settings.yml
+                module1-database.yml
+                global.yml
     """
 
-    def __init__(self, env=None):
+    def __init__(self, env="dev", base_dir="config", module=None):
         """
-        Initializes the ConfigReader for the specified environment.
+        Initialize the MultiConfigReader.
 
         Args:
-            env (str, optional): The environment identifier (e.g., "dev", "prod").
-                                 Defaults to "dev".
+            env (str): The environment folder to load configuration from (e.g., "dev", "prod").
+                       Defaults to "dev".
+            base_dir (str): The base directory where configuration folders are located.
+                            Defaults to "config".
+            module (str, optional): The module name to filter configuration files.
+                                    Only files whose filenames start with this string will be
+                                    loaded. If None, all files in the environment folder are loaded.
         """
-        if (env is None):
-            self.config_file = f"src/config/application.yml"
-        else:
-            self.config_file = f"src/config/application-{env}.yml"
-        self.config = self._load_config()
+        self.config_dir = os.path.join(base_dir, env)
+        self.module = module
+        self.config = self._load_all_configs()
 
-    def _load_config(self):
+    @staticmethod
+    def deep_merge(dict1, dict2):
         """
-        Loads the YAML configuration file.
+        Recursively merge dict2 into dict1.
+        If a key exists in both dictionaries and both values are dicts,
+        merge them recursively. Otherwise, overwrite with dict2's value.
+
+        Args:
+            dict1 (dict): The original dictionary.
+            dict2 (dict): The dictionary to merge into dict1.
 
         Returns:
-            dict: The configuration data.
-
-        Raises:
-            FileNotFoundError: If the configuration file is not found.
+            dict: The merged dictionary.
         """
-        if not os.path.exists(self.config_file):
-            raise FileNotFoundError(f"Config file {self.config_file} not found!")
+        for key, value in dict2.items():
+            if key in dict1 and isinstance(dict1[key], dict) and isinstance(value, dict):
+                ConfigReader.deep_merge(dict1[key], value)
+            else:
+                dict1[key] = value
+        return dict1
 
-        with open(self.config_file, "r") as file:
-            return yaml.safe_load(file)
+    def _load_all_configs(self):
+        """
+        Loads and deep-merges all YAML files in the configuration directory.
+        If a module name is provided, only those files whose filenames start with the
+        module name are loaded.
+
+        Returns:
+            dict: The merged configuration dictionary.
+        """
+        merged_config = {}
+        for filename in os.listdir(self.config_dir):
+            if filename.lower().endswith((".yml", ".yaml")):
+                # If module is provided, skip files that don't start with the module name.
+                if self.module and not filename.startswith(self.module):
+                    continue
+                file_path = os.path.join(self.config_dir, filename)
+                with open(file_path, "r") as f:
+                    config_data = yaml.safe_load(f) or {}
+                    merged_config = self.deep_merge(merged_config, config_data)
+        return merged_config
 
     def get(self, key, default=None):
         """
-        Retrieves a nested configuration value based on a dot-separated key.
+        Retrieve a nested configuration value using a dot-separated key.
 
         Args:
             key (str): Dot-separated key string (e.g., "server.port").
-            default (any, optional): Default value if the key is not found. Defaults to None.
+            default: Value to return if the key is not found.
 
         Returns:
-            any: The configuration value or the default if not found.
+            The configuration value or default if not found.
         """
         keys = key.split(".")
         value = self.config
         for k in keys:
-            value = value.get(k, {})
-        return value or default
+            if isinstance(value, dict):
+                value = value.get(k, None)
+            else:
+                return default
+            if value is None:
+                return default
+        return value

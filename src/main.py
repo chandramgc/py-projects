@@ -26,7 +26,7 @@ def main():
     logger.info("Starting the application")
 
     # Load configuration from YAML for the 'dev' environment.
-    config: Any = ConfigReader(env=env)
+    config: Any = ConfigReader(env=env, base_dir="config", module="application")
     profile = config.get("profile")
     logger.info(f"This application is running on {profile}")
 

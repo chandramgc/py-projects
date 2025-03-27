@@ -91,4 +91,4 @@ class ReportWriter:
         filepath = os.path.join(self.output_dir, filename)
         with open(filepath, "w") as f:
             json.dump(report_data, f, indent=4)
-        print(f"Grouped report written to {filepath}")
+        logger.info(f"Grouped report written to {filepath}")
