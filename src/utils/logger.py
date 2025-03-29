@@ -62,7 +62,7 @@ class LoggerConfig:
             env (str): The environment identifier (e.g. "dev", "prod").
         """
         self.env = env
-        self.config = ConfigReader(env="dev", base_dir="config", module="application")
+        self.config = ConfigReader(env="desktop", base_dir="config", module="application")
 
     def configure(self):
         """

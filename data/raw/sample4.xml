@@ -38,8 +38,16 @@
                     <Level>message</Level>
                     <Type>PRM</Type>
                     <ExecutionParm>
-                        <ParmID>WFI$FEE</ParmID>
-                        <ParmValues>R</ParmValues>
+                        <ParmID>WFI$CHARGE_PARTY</ParmID>
+                        <ParmValues>B</ParmValues>
+                    </ExecutionParm>
+                </ProcessingRule>
+                <ProcessingRule>
+                    <Level>message</Level>
+                    <Type>PRM</Type>
+                    <ExecutionParm>
+                        <ParmID>WFI$CHARGE_PARTY</ParmID>
+                        <ParmValues>B</ParmValues>
                     </ExecutionParm>
                 </ProcessingRule>
             </BasicPayment>

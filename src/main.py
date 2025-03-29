@@ -11,6 +11,7 @@ from src.utils.config_reader import ConfigReader
 from src.utils.logger import LoggerConfig
 from src.modules.p_rule_counter import ProcessingRuleCounter
 from src.services.report_writer import ReportWriter
+from src.modules.p_rule_repetition_counter import PRuleByRepetitionCounter
 
 
 # Add the project root (the parent directory of src) to sys.path
@@ -30,19 +31,29 @@ def main():
     profile = config.get("profile")
     logger.info(f"This application is running on {profile}")
 
-    xml_directory = config.get("file.dir")
+    xml_dir = config.get("file.dir")
+    root_xpath = config.get("file.root_xpath")
+    key_prams = config.get("file.key_prams")
     key_xpaths = config.get("file.key_xpaths")
     report_directory = config.get("file.report.dir")
     report_file_name = config.get("file.report.file_name")
 
-    counter = ProcessingRuleCounter(xml_directory, key_xpaths)
-    rule_counts = counter.count_rules()
-    print("Rule counts (combination of keys):")
-    for key, count in sorted(rule_counts.items(), key=lambda x: x[0]):
-        print(f"{list(key)}: {count}")
-
     writer: ReportWriter = ReportWriter(report_directory)
-    writer.write_grouped_report(rule_counts, report_file_name)
+
+    # counter = ProcessingRuleCounter(xml_dir, key_xpaths)
+    # rule_counts = counter.count_rules()
+    # print("Rule counts (combination of keys):")
+    # for key, count in sorted(rule_counts.items(), key=lambda x: x[0]):
+    #     print(f"{list(key)}: {count}")   #
+    #
+    # writer.write_grouped_report(rule_counts, report_file_name)
+
+    counter = PRuleByRepetitionCounter(xml_dir, root_xpath, key_prams)
+    result = counter.process()
+    counter.print_grouped_result(result)
+
+    writer.write_grouped_by_repetition_counter(result, report_file_name)
+
     logger.info("Application finished execution")
 
 

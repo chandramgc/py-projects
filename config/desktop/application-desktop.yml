@@ -1,9 +1,12 @@
 profile: desktop
 file:
+  root_xpath: ".//ProcessingRule/ExecutionParm"
+  key_prams:
+    - "ParmID"
   key_xpaths:
     - ".//ProcessingRule/ExecutionParm/ParmID"
     - ".//ProcessingRule/ExecutionParm/ParmValues"
   dir: "data\\raw"
   report:
     dir: "data\\report"
-    file_name: "p_rules_report.json"
+    file_name: "p_rules_report_by_counter.json"

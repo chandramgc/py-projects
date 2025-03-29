@@ -1,7 +1,7 @@
 import logging
 import os
 import json
-from src.utils.logger import LoggerConfig
+from collections import defaultdict
 
 # Retrieve a logger for this module.
 logger = logging.getLogger(__name__)
@@ -92,3 +92,95 @@ class ReportWriter:
         with open(filepath, "w") as f:
             json.dump(report_data, f, indent=4)
         logger.info(f"Grouped report written to {filepath}")
+
+    def write_grouped_by_keys_filename(self, counts: dict, filename: str):
+        """
+            Groups the counts dictionary by key tuple (excluding filename), and
+            nests filenames underneath.
+
+            Example structure:
+            {
+                (ParmID, ParmValues): {
+                    filename: count
+                }
+            }
+
+            Args:
+                counts (dict): Flat counts dictionary with full key (ParmID, ParmValues, filename)
+                output_file (str): Path to output JSON file
+            """
+        grouped = defaultdict(dict)
+
+        for key_tuple, count in counts.items():
+            *rule_keys, filename = key_tuple
+            grouped[tuple(rule_keys)][filename] = count
+
+        # Convert tuple keys to strings for JSON serialization
+        grouped_serializable = {
+            str(k): v for k, v in grouped.items()
+        }
+        filepath = os.path.join(self.output_dir, filename)
+        with open(filepath, "w") as f:
+            json.dump(grouped_serializable, f, indent=4)
+
+        logger.info(f"JSON written to: {filepath}")
+
+    def nest_keys_recursively(self, counts_dict):
+        """
+        Recursively builds a nested dict structure from multi-part tuple keys.
+        Input: { ("A", "B", "C"): { "1": 2, "2": 1 } }
+        Output:
+        [
+            {
+                "key": "A",
+                "subValue": [
+                    {
+                        "key": "B",
+                        "subValue": [
+                            {
+                                "key": "C",
+                                "counts": { "1": 2, "2": 1 }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        """
+
+        def insert_nested(current_level, key_parts, count_dict):
+            key = key_parts[0]
+            rest = key_parts[1:]
+
+            # Find or create matching entry in current_level
+            for entry in current_level:
+                if entry["key"] == key:
+                    break
+            else:
+                entry = {"key": key}
+                current_level.append(entry)
+
+            if rest:
+                if "subValue" not in entry:
+                    entry["subValue"] = []
+                insert_nested(entry["subValue"], rest, count_dict)
+            else:
+                entry["counts"] = dict(count_dict)  # convert defaultdict to regular dict if needed
+
+        result = []
+        for key_tuple, count_dict in counts_dict.items():
+            insert_nested(result, list(key_tuple), count_dict)
+
+        return result
+
+    def write_grouped_by_repetition_counter(self, counts_dict, filename):
+        """
+        Build nested structure dynamically from key tuples and write to JSON.
+        """
+        nested_data = self.nest_keys_recursively(counts_dict)
+
+        filepath = os.path.join(self.output_dir, filename)
+        with open(filepath, "w") as f:
+            json.dump(nested_data, f, indent=4)
+
+        logger.info(f"JSON written to: {filepath}")
