@@ -56,6 +56,5 @@ def main():
 
     logger.info("Application finished execution")
 
-
 if __name__ == "__main__":
     main()
