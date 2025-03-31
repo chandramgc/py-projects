@@ -9,7 +9,7 @@ setup(
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/chandramgc/py-projects",
-    packages=find_packages(where="src"),
+    packages=find_packages(where="src", exclude=["tests"]),
     package_dir={"": "src"},
     include_package_data=True,
     install_requires=[
@@ -18,7 +18,10 @@ setup(
         "pyyaml",
         "coverage",
         "sphinx",
+        "dagster",
+        "dagster-cloud"
     ],
+    extras_require={"dev": ["dagster-webserver", "pytest"]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
