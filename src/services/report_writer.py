@@ -128,7 +128,11 @@ class ReportWriter:
     def nest_keys_recursively(self, counts_dict):
         """
         Recursively builds a nested dict structure from multi-part tuple keys.
-        Input: { ("A", "B", "C"): { "1": 2, "2": 1 } }
+        Adds 'counts' at each group level by summing nested counts.
+
+        Example Input:
+            { ("A", "B"): { "1": 2, "3": 1 }, ("A", "C"): { "1": 4 } }
+
         Output:
         [
             {
@@ -136,23 +140,31 @@ class ReportWriter:
                 "subValue": [
                     {
                         "key": "B",
-                        "subValue": [
-                            {
-                                "key": "C",
-                                "counts": { "1": 2, "2": 1 }
-                            }
-                        ]
+                        "counts": { "1": 2, "3": 1 }
+                    },
+                    {
+                        "key": "C",
+                        "counts": { "1": 4 }
                     }
-                ]
+                ],
+                "counts": {
+                    "1": 6,
+                    "3": 1
+                }
             }
         ]
         """
+
+        def merge_counts(c1, c2):
+            result = defaultdict(int, c1)
+            for k, v in c2.items():
+                result[k] += v
+            return result
 
         def insert_nested(current_level, key_parts, count_dict):
             key = key_parts[0]
             rest = key_parts[1:]
 
-            # Find or create matching entry in current_level
             for entry in current_level:
                 if entry["key"] == key:
                     break
@@ -164,8 +176,15 @@ class ReportWriter:
                 if "subValue" not in entry:
                     entry["subValue"] = []
                 insert_nested(entry["subValue"], rest, count_dict)
+
+                # Recalculate group-level counts
+                group_counts = defaultdict(int)
+                for sub in entry["subValue"]:
+                    for k, v in sub.get("counts", {}).items():
+                        group_counts[k] += v
+                entry["counts"] = dict(group_counts)
             else:
-                entry["counts"] = dict(count_dict)  # convert defaultdict to regular dict if needed
+                entry["counts"] = dict(count_dict)
 
         result = []
         for key_tuple, count_dict in counts_dict.items():

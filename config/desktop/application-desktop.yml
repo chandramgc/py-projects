@@ -3,10 +3,11 @@ file:
   root_xpath: ".//ProcessingRule/ExecutionParm"
   key_prams:
     - "ParmID"
+    - "ParmValues"
   key_xpaths:
     - ".//ProcessingRule/ExecutionParm/ParmID"
     - ".//ProcessingRule/ExecutionParm/ParmValues"
   dir: "data\\raw"
   report:
     dir: "data\\report"
-    file_name: "p_rules_report_by_counter.json"
+    file_name: "p_rules_report_by_counter_new.json"
