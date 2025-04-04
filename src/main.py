@@ -3,12 +3,15 @@ Module: main
 This is the entry point of the application. It loads the environment configuration,
 initializes the Application, and starts the Flask API server.
 """
-from typing import Any
 
+import logging.config
+import yaml
+import math
 import sys
 # import os
+from typing import Any
 from src.utils.config_reader import ConfigReader
-from src.utils.logger import setup_logger
+from src.utils.logger_config import LoggerConfigurator
 
 
 # Add the project root (the parent directory of src) to sys.path
@@ -20,8 +23,15 @@ def main():
     """
     # Get the environment from the command line, default to "dev" if not provided.
     env = sys.argv[1] if len(sys.argv) > 1 else "desktop"
-    logger: Any = setup_logger()
+
+    LoggerConfigurator()
+
+    logger = logging.getLogger(__name__)
+
     logger.info("Starting the application")
+
+    for counter in range(1, 10000):
+        logger.info(f"Counter: {counter}, Log: {math.log(counter)}")
 
     # Load configuration from YAML for the 'dev' environment.
     config: Any = ConfigReader(env=env)

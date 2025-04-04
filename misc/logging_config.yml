@@ -1,0 +1,31 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  standard:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: standard
+    stream: ext://sys.stdout
+
+  rotating_file:
+    class: src.utils.custom_handlers.CompressingRotatingFileHandler
+    level: INFO
+    formatter: standard
+    filename: "logs/app.log"
+    maxBytes: 10240    # 10 KB
+    backupCount: 5
+
+loggers:
+  app:
+    level: DEBUG
+    handlers: [ console, rotating_file ]
+    propagate: no
+
+root:
+  level: DEBUG
+  handlers: [ console, rotating_file ]
