@@ -1,6 +1,6 @@
 # sample_job.py
 import math
-from dagster import op, job, get_dagster_logger
+from dagster import op, job
 from src.utils.logger_config import LoggerConfigurator
 
 # Instantiating LoggerConfigurator automatically configures logging.
@@ -15,8 +15,10 @@ def get_message():
 @op
 def print_message(message: str):
     logger.info(message)
-    for counter in range(1, 11):
+    for counter in range(1, 1001):
         logger.info(f"Counter: {counter}, Log: {math.log(counter)}")
+    # for counter in range(1, 11):
+    #     logger.debug(f"Counter: {counter}, Log: {math.log(counter)}")
 
 
 @job

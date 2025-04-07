@@ -1,0 +1,18 @@
+python_logs:
+  dagster_handler_config:
+    handlers:
+      rotating_file:
+        class: src.utils.custom_handlers.CompressingRotatingFileHandler
+        level: DEBUG
+        formatter: standardFormatter
+        filename: "logs/dagster_logs.log"
+        maxBytes: 10240      # 10 KB
+        backupCount: 5
+    formatters:
+      standardFormatter:
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+      timeFormatter:
+        format: "%(asctime)s :: %(message)s"
+    filters:
+      dagster_filter:
+        name: dagster

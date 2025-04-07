@@ -2,29 +2,39 @@ version: 1
 disable_existing_loggers: false
 
 formatters:
-  standard:
+  standardFormatter:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: standard
+    formatter: standardFormatter
     stream: ext://sys.stdout
-
+  file_handler:
+    class: logging.FileHandler
+    level: INFO
+    filename: "logs/app.log"
+    mode: "a"
+    formatter: standardFormatter
   rotating_file:
     class: src.utils.custom_handlers.CompressingRotatingFileHandler
     level: INFO
-    formatter: standard
+    formatter: standardFormatter
     filename: "logs/app.log"
-    maxBytes: 10240    # 10 KB
+    maxBytes: 50240    # 10 KB
     backupCount: 5
 
 loggers:
   app:
     level: DEBUG
     handlers: [ console, rotating_file ]
-    propagate: no
+    propagate: false
+
+  dagster:
+    level: DEBUG
+    handlers: [ console, rotating_file ]
+    propagate: false
 
 root:
   level: DEBUG

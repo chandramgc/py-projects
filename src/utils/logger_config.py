@@ -1,10 +1,11 @@
 # logger_config.py
 import logging.config
 import yaml
-from dagster import get_dagster_logger as dagster_get_logger
+from dagster import get_dagster_logger as dagster_logger
 
 # Global variable for the logging configuration file.
-LOGGING_CONFIG_FILE = "misc/logging_config.yml"
+LOGGING_CONFIG_FILE = "misc/logging_config.yaml"
+LOGGER_APP = "app"
 
 
 class LoggerConfigurator:
@@ -32,12 +33,11 @@ class LoggerConfigurator:
         return logging.getLogger()
 
     @staticmethod
-    def get_dagster_logger(config_file=LOGGING_CONFIG_FILE):
+    def get_dagster_logger():
         """
         Set up logging using the given configuration file and return the Dagster logger.
 
         Returns:
             Logger: The configured Dagster logger.
         """
-        LoggerConfigurator.apply_config(config_file)
-        return dagster_get_logger()
+        return dagster_logger()
