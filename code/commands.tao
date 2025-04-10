@@ -1,0 +1,65 @@
+// File: commands.tao
+// Import modules required for handling tasks, the todo list, and persistence.
+import "todolist.tao";
+import "persistence.tao";
+
+function processCommand(todo, commandLine) {
+    // Split the command into parts; assumes commands and their parameters are space-delimited.
+    let parts = commandLine.split(" ");
+    let command = parts[0];
+
+    if (command == "add") {
+        // Everything after "add " is taken as the task description.
+        let description = commandLine.substring(4);
+        todo.addTask(description);
+        print("Task added: ", description);
+        return true;
+    } else if (command == "remove") {
+        let index = toNumber(parts[1]);
+        todo.removeTask(index);
+        return true;
+    } else if (command == "complete") {
+        let index = toNumber(parts[1]);
+        todo.completeTask(index);
+        print("Task at index ", index, " marked as complete.");
+        return true;
+    } else if (command == "list") {
+        todo.listTasks();
+        return true;
+    } else if (command == "save") {
+        // Expected format: save [filename]
+        let filename = parts[1];
+        if (filename == "") {
+            print("Please specify a filename to save to.");
+        } else {
+            if (saveTodoList(todo, filename)) {
+                print("Todo list saved to ", filename);
+            } else {
+                print("Failed to save todo list to ", filename);
+            }
+        }
+        return true;
+    } else if (command == "load") {
+        // Expected format: load [filename]
+        let filename = parts[1];
+        if (filename == "") {
+            print("Please specify a filename to load from.");
+        } else {
+            let loadedTodo = loadTodoList(filename);
+            if (loadedTodo != null) {
+                // Replace the tasks in the current list with those loaded from file.
+                todo.tasks = loadedTodo.tasks;
+                print("Todo list loaded from ", filename);
+            } else {
+                print("Failed to load todo list from ", filename);
+            }
+        }
+        return true;
+    } else if (command == "exit") {
+        print("Exiting the Todo Manager.");
+        return false; // Returning false signals the command loop to exit.
+    } else {
+        print("Invalid command. Please try again.");
+        return true;
+    }
+}

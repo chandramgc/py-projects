@@ -1,0 +1,46 @@
+// File: todolist.tao
+// Import the Task class from task.tao
+import "task.tao";
+
+class TodoList {
+    // Constructor creates an empty list of tasks.
+    function TodoList() {
+        this.tasks = [];
+    }
+    
+    // Adds a new task to the list.
+    function addTask(taskDescription) {
+        let task = new Task(taskDescription);
+        this.tasks.append(task);
+    }
+    
+    // Removes a task by its index.
+    function removeTask(index) {
+        if (index < 0 || index >= this.tasks.length) {
+            print("Error: Task index out of range.");
+            return;
+        }
+        this.tasks.removeAt(index);
+    }
+    
+    // Marks a task as complete by its index.
+    function completeTask(index) {
+        if (index < 0 || index >= this.tasks.length) {
+            print("Error: Task index out of range.");
+            return;
+        }
+        this.tasks[index].markComplete();
+    }
+    
+    // Lists all tasks in the todo list.
+    function listTasks() {
+        if (this.tasks.length == 0) {
+            print("Todo List is empty.");
+            return;
+        }
+        // Iterate over tasks and print each one.
+        for (let i = 0; i < this.tasks.length; i = i + 1) {
+            print(i, ": ", this.tasks[i].toString());
+        }
+    }
+}

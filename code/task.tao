@@ -1,0 +1,21 @@
+// File: task.tao
+// Defines the Task class
+
+class Task {
+    // Constructor initializes a task with a description and an optional completion flag.
+    function Task(description, isCompleted = false) {
+        this.description = description;
+        this.isCompleted = isCompleted;
+    }
+
+    // Marks the task as complete.
+    function markComplete() {
+        this.isCompleted = true;
+    }
+
+    // Returns a string representation of the task.
+    function toString() {
+        let status = this.isCompleted ? "[Done]" : "[Pending]";
+        return status + " " + this.description;
+    }
+}

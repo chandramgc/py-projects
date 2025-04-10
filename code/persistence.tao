@@ -1,0 +1,47 @@
+// File: persistence.tao
+// Import necessary classes.
+import "task.tao";
+import "todolist.tao";
+
+// Saves the Todo list to a file specified by filename.
+// Format per line: "1|Task description" if the task is completed, "0|Task description" if pending.
+function saveTodoList(todo, filename) {
+    let file = openFile(filename, "w");
+    if (file == null) {
+        return false;
+    }
+    for (let i = 0; i < todo.tasks.length; i = i + 1) {
+        let task = todo.tasks[i];
+        let status = task.isCompleted ? "1" : "0";
+        let line = status + "|" + task.description + "\n";
+        file.write(line);
+    }
+    file.close();
+    return true;
+}
+
+// Loads a Todo list from a file and returns a new TodoList instance.
+// If the file cannot be read, returns null.
+function loadTodoList(filename) {
+    let file = openFile(filename, "r");
+    if (file == null) {
+        return null;
+    }
+    let newTodo = new TodoList();
+    while (!file.eof()) {
+        let line = file.readLine();
+        if (line == "") {
+            continue;
+        }
+        let parts = line.split("|");
+        if (parts.length < 2) {
+            continue;
+        }
+        let status = parts[0];
+        let description = parts[1];
+        let task = new Task(description, status == "1");
+        newTodo.tasks.append(task);
+    }
+    file.close();
+    return newTodo;
+}

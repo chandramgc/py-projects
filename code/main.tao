@@ -1,0 +1,45 @@
+// File: main.tao
+// Import modules: the TodoList class, command processing functions, and persistence functions.
+import "todolist.tao";
+import "commands.tao";
+import "persistence.tao";
+
+// Simulated readLine function for user input.
+// In a real implementation, this would capture input from a user console.
+function readLine() {
+    // Replace this stub with actual input handling code as needed.
+    return "";
+}
+
+function runTodoManager() {
+    let todo = new TodoList();
+    let continueLoop = true;
+    
+    while (continueLoop) {
+        print("\n--- Tao Todo List Manager ---");
+        print("Available Commands:");
+        print("  add [task description]  - Add a new task");
+        print("  remove [index]          - Remove task at given index");
+        print("  complete [index]        - Mark task at given index as complete");
+        print("  list                    - Display all tasks");
+        print("  save [filename]         - Save tasks to a file");
+        print("  load [filename]         - Load tasks from a file");
+        print("  exit                    - Exit the manager");
+        print("Enter command: ");
+        
+        let input = readLine();
+        if (input == "") {
+            continue;  // Skip iteration if no command is entered.
+        }
+        // Process the command; if processCommand returns false, exit the loop.
+        continueLoop = processCommand(todo, input);
+    }
+}
+
+function main() {
+    print("Welcome to Tao Todo List Manager!");
+    runTodoManager();
+}
+
+// Program entry point.
+main();
