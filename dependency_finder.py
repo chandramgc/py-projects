@@ -23,9 +23,9 @@ def module_name_from_path(file_path, root_dir):
     The module name is the file’s relative path (with forward slashes)
     with the ".tao" extension removed.
 
-    For example, if file_path is "/path/to/code/task.tao" and
-    root_dir is "/path/to/code", the module name becomes "task".
-    For a nested file like "/path/to/code/lib/util.tao", the module name
+    For example, if file_path is "/path/to/code_tao/task.tao" and
+    root_dir is "/path/to/code_tao", the module name becomes "task".
+    For a nested file like "/path/to/code_tao/lib/util.tao", the module name
     becomes "lib/util".
     """
     rel_path = os.path.relpath(file_path, root_dir)

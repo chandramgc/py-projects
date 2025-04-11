@@ -1,0 +1,30 @@
+;-------------------------------------------
+; account.tal – Account Handling Functions
+;-------------------------------------------
+?SOURCE "common.tal"    ; Bring in common utility functions
+
+; GET_ACCOUNT - Retrieve account details by account_id.
+FUNCTION GET_ACCOUNT(account_id, account)
+    ; Simulation: In a real implementation, this queries a database.
+    IF account_id = "ACC2001" THEN
+        account.balance = 500
+        RETURN
+    ENDIF
+    IF account_id = "ACC2002" THEN
+        account.balance = 300
+        RETURN
+    ENDIF
+    IF account_id = "BANK_FEE_ACCOUNT" THEN
+        account.balance = 1000
+        RETURN
+    ENDIF
+
+    ; Account not found: Set account to NULL.
+    account = NULL
+END FUNCTION
+
+; UPDATE_ACCOUNT - Persist the updated account information.
+FUNCTION UPDATE_ACCOUNT(account)
+    ; Simulation: In a real system, this would update the account record in a database.
+    WRITE "Account updated: New Balance = " + account.balance
+END FUNCTION

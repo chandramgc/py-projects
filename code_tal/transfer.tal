@@ -1,0 +1,72 @@
+;-------------------------------------------
+; transfer.tal – Funds Transfer Transaction
+;-------------------------------------------
+?SOURCE "common.tal"   ; Import common utilities
+?SOURCE "account.tal"  ; Import account functions
+
+TBEGIN MAIN_TRANSACTION
+    ; Log the start of the transaction
+    LOG("Starting Transfer Transaction")
+
+    ; Step 1: Retrieve sender and receiver accounts
+    GET_ACCOUNT("ACC2001", sender)
+    GET_ACCOUNT("ACC2002", receiver)
+
+    ; Validate account existence
+    IF sender IS NULL THEN
+        LOG("Error: Sender account not found.")
+        TROLLBACK
+        EXIT
+    ENDIF
+    IF receiver IS NULL THEN
+        LOG("Error: Receiver account not found.")
+        TROLLBACK
+        EXIT
+    ENDIF
+
+    ; Step 2: Set the transaction details
+    SET transfer_amount = 100   ; Amount to transfer
+    SET fee = 2                 ; Processing fee
+    SET total_amount = transfer_amount + fee
+
+    ; Check if the sender has sufficient funds
+    IF sender.balance < total_amount THEN
+        LOG("Error: Insufficient funds in sender account.")
+        TROLLBACK
+        EXIT
+    ENDIF
+
+    ; Step 3: Perform the funds transfer as a subtransaction
+    TBEGIN SUBTRANSACTION Funds_Transfer
+        ; Debit the sender’s account and credit the receiver’s account
+        sender.balance := sender.balance - total_amount
+        receiver.balance := receiver.balance + transfer_amount
+
+        ; Update both account records
+        UPDATE_ACCOUNT(sender)
+        UPDATE_ACCOUNT(receiver)
+    TCOMMIT SUBTRANSACTION Funds_Transfer
+
+    ; Step 4: Process fee charging in a separate subtransaction
+    TBEGIN SUBTRANSACTION Fee_Processing
+        GET_ACCOUNT("BANK_FEE_ACCOUNT", fee_account)
+        IF fee_account IS NULL THEN
+            LOG("Error: Fee account not found.")
+            TROLLBACK
+            EXIT
+        ENDIF
+
+        ; Credit the fee amount to the bank fee account
+        fee_account.balance := fee_account.balance + fee
+
+        ; Save the fee account update
+        UPDATE_ACCOUNT(fee_account)
+    TCOMMIT SUBTRANSACTION Fee_Processing
+
+    ; Step 5: Log success and write an audit record
+    LOG("Transfer successful: " + transfer_amount + " transferred; fee: " + fee)
+    INSERT_AUDIT_RECORD("Transfer", "ACC2001", "ACC2002", transfer_amount, fee)
+TCOMMIT MAIN_TRANSACTION
+
+; End-of-transaction log entry
+LOG("Main Transaction Completed Successfully")

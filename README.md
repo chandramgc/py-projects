@@ -3,7 +3,11 @@
 ## Execution commands
 
 ```bash
-python dependency_finder.py code
+python dependency_finder.py code_tao
+```
+
+```bash
+python dependency_tal_finder.py
 ```
 
 ```bash

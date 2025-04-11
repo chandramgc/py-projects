@@ -1,0 +1,15 @@
+;-------------------------------------------
+; common.tal – Common Utility Functions
+;-------------------------------------------
+
+; LOG - Write a message to the system log.
+FUNCTION LOG(message)
+    ; Implementation: In a real environment, this writes to a logging mechanism.
+    WRITE "[LOG] " + message
+END FUNCTION
+
+; INSERT_AUDIT_RECORD - Record transaction details for auditing purposes.
+FUNCTION INSERT_AUDIT_RECORD(type, from_acc, to_acc, amount, fee)
+    ; Implementation: In a real system, this persists an audit record.
+    WRITE "[AUDIT] Type: " + type + ", From: " + from_acc + ", To: " + to_acc + ", Amount: " + amount + ", Fee: " + fee
+END FUNCTION
